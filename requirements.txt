@@ -1,0 +1,12 @@
+mne
+numpy
+matplotlib
+pandas
+pyvistaqt
+darkdetect
+ipywidgets
+pywavelets
+scipy
+scikit-learn
+imbalanced-learn
+torch
