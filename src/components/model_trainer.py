@@ -165,10 +165,12 @@ def train(
             )
 
             for key, value in zip(model_metrics[model_name].keys(), metrics[:-1]):
-                model_metrics[model_name][key].append(value)
+                model_metrics[model_name][key].append(round(value * 100, 2))
 
         models_registry[model_name] = metrics[-1]
         model_metrics[model_name] = compute_average_metrics(
             model_metrics[model_name])
 
+        print("######################")
+        print(model_metrics)
     return model_metrics, models_registry
