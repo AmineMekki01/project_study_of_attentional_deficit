@@ -1,3 +1,10 @@
+
+# Ignore files in data -> Sensitive
+*.fdt
+*.set
+research
+src/models
+.vscode 
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
