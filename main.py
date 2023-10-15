@@ -9,7 +9,8 @@ from src.components.feature_selection import feature_selection_RFC, feature_sele
 from src.components.model_trainer import train
 from src.components.evaluate import evaluate_on_new_data
 # Make sure this import path is correct
-from src.pipeline import training_pipeline
+from src.pipeline.train_pipeline import training_pipeline
+from src.pipeline.test_pipeline import testing_pipeline
 
 # Set environment variable to hide pygame support prompt
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -19,7 +20,9 @@ DATA_PATH_S11 = os.getenv(
     "DATA_PATH_S11", "./artifacts/data/raw/AEP/Subject_11_H_AEP_Run_01.set")
 TEST_DATA_PATH = os.getenv(
     "TEST_DATA_PATH", "./artifacts/data/raw/AEP/Subject_15_H_AEP_Run_01.set")
+
 EVALUATION_METHOD = os.getenv("EVALUATION_METHOD", 'stratifiedKFold')
+
 INCLUDE_AUC = EVALUATION_METHOD != 'loo'
 
 # Feature selection methods
@@ -37,15 +40,19 @@ models: Dict[str, Callable] = {
 }
 
 if __name__ == "__main__":
+    # try:
+    #     # Run the training pipeline
+    #     training_pipeline(
+    #         DATA_PATH_S11,
+    #         feature_selection_methods,
+    #         models,
+    #         EVALUATION_METHOD
+    #     )
+    # except Exception as e:
+    #     print(f"An error occurred during training: {e}")
+
     try:
-        # Run the training pipeline
-        training_pipeline(
-            DATA_PATH_S11,
-            feature_selection_methods,
-            models,
-            EVALUATION_METHOD,
-            INCLUDE_AUC,
-            TEST_DATA_PATH
-        )
+        df = testing_pipeline(TEST_DATA_PATH, 'Random Forest', 'RFC')
+        print(df)
     except Exception as e:
-        print(f"An error occurred during training: {e}")
+        print(f"An error occurred during testing: {e}")
