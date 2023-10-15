@@ -2,6 +2,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import mne
 from src.components.feature_engineering import get_features
 from typing import Union, Tuple
+import pandas as pd
 
 
 def evaluate_on_new_data(model, path_to_new_epochs, feature_selector, include_auc=True) -> Tuple[float, float, float, float, Union[float, str]]:
@@ -68,4 +69,7 @@ def evaluate_on_new_data(model, path_to_new_epochs, feature_selector, include_au
         except ValueError as e:
             print(str(e))
 
-    return accuracy, precision, recall, f1, roc_auc
+    test_metrics_df = pd.DataFrame(
+        {'Accuracy': [accuracy], 'Precision': [precision], 'Recall': [recall], 'F1': [f1], 'ROC AUC': [roc_auc]})
+
+    return test_metrics_df
