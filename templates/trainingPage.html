@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EEG Analysis : Train Page</title>
+    <link rel="stylesheet" href="./../static/styles.css">
+</head>
+<body>
+
+    <div class="pages">
+        <a href="/">Home</a>
+        <a href="/train">Train</a>
+        <a href="/test">Test</a>
+    </div>
+    
+    
+    <form id="upload-form" action="/train" method="post" enctype="multipart/form-data">
+        <h1>Enter Your specs</h1>
+        <div class="specs-input">
+            <div class="common-input-styles">
+                <label for="featureSelection">Feature Selection Method : </label>        
+                <select name="featureSelection" class="inputFile">
+                    <option value="RFC">Random Forest Classifier</option>
+                    <option value="LDA">Linear Discriminant Analysis</option>
+                    <option value="RFE">Recursive Feature Elimination</option>
+                </select>
+            </div>
+            <div class="common-input-styles">
+                <label for="model">Model To Use : </label>  
+                <select name="model" class="inputFile">
+                    <option value="Random Forest">Random Forest</option>
+                    <option value="Linear Discriminant Analysis">Linear Discriminant Analysis</option>
+                    <option value="Support Vector Machine">Support Vector Machine</option>
+                </select>
+            </div>
+            <div class="common-input-styles">
+                <label for="model">Cross Evaluation Method : </label>  
+                <select name="CrossValidationMethod" class="inputFile">
+                    <option value="stratifiedKFold">K Stratified Cross Validation </option>
+                    <option value="loo">Leave One Out Cross Validation</option>
+                </select>
+            </div>
+        </div>
+
+        
+        <div class="upload-container">
+            <h1>Upload Your EEG Data :</h1>
+            <div class="specs-input"> 
+                <div class="common-upload-styles">
+                    <label for="set_file">Upload EEG Data (.set file) : </label>
+                    <input type="file" name="set_file" class="input-file">
+                </div> 
+                <div class="common-upload-styles">
+                    <label for="fdt_file">Upload EEG Data (.fdt file) : </label>
+                    <input type="file" name="fdt_file" class="input-file">
+                </div>
+            </div>
+            <input type="submit" class="upload-submit">
+        </div>
+        
+    </form>
+
+    <div class="results-container">
+        <h1>Results :</h1>
+
+        <div class="metrics-container">
+            <h2>Training Metrics:</h2>
+            <div id="metrics_id"></div>
+            
+        </div>
+
+        
+        <div class="plot-container">
+            <h2>PSD Plot :</h2>
+            <img id="psd-plot" alt="PSD Plot">
+        </div>
+        <div class="plot-container">
+            <h2>Raw Data Plot :</h2>
+            <img id="raw-data-plot" alt="Raw Data Plot">
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="./../static/scripts.js"></script>
+</body>
+</html>
