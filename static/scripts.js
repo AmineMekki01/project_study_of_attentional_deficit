@@ -39,10 +39,10 @@ function setupFormSubmit(endpoint) {
             type: 'POST',
             data: formData,
             success: function(data) {
-                console.log(data);
+                console.log("xxxxxxxxxx",data);
                 $('#psd-plot').attr('src', data.psd_path);
                 $('#raw-data-plot').attr('src', data.raw_data_path);
-
+                $('#train-confusion-matrix').attr('src', data.confusion_matrix_plot_path);
                 var table = createTableFromJSON(data.metrics);
                 $('#metrics_id').html(table);
             },
