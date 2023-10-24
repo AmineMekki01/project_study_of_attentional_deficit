@@ -11,6 +11,9 @@ from sklearn.model_selection import LeaveOneOut
 import numpy as np
 from typing import Dict, List, Union, Tuple
 from sklearn.base import BaseEstimator
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+from src.utils.plotting import plot_confusion_matrix
 
 
 def evaluate_model(
@@ -20,7 +23,7 @@ def evaluate_model(
     y_train: np.ndarray,
     y_test: np.ndarray,
     include_auc: bool = True
-) -> Tuple[float, float, float, float, Union[float, str]]:
+) -> Tuple[float, float, float, float, Union[float, str], np.ndarray]:
     """
     This function takes the model, the training data, the testing data and the include_auc flag as input. It returns the accuracy, precision, recall, f1 and roc_auc scores.
 
@@ -64,6 +67,8 @@ def evaluate_model(
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred)
+    print("cm right after generation:", cm)
 
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(
@@ -81,14 +86,19 @@ def evaluate_model(
     else:
         roc_auc = "Not available"
 
-    return accuracy, precision, recall, f1, roc_auc, model
+    return accuracy, precision, recall, f1, roc_auc, cm, model
 
 
-def compute_average_metrics(metrics: Dict[str, List[Union[float, str]]]) -> Dict[str, float]:
-    """Compute the average of the metrics."""
+def compute_average_metrics(metrics: Dict[str, List[Union[float, str, np.ndarray]]]) -> Dict[str, Union[float, np.ndarray]]:
     avg_metrics = {}
     for key, values in metrics.items():
-        avg_metrics[key] = np.mean([x for x in values if x != "Not available"])
+        if key != 'confusion_matrix':
+            avg_metrics[key] = np.mean(
+                [x for x in values if x != "Not available"])
+        else:
+            # Assuming that all confusion matrices have the same shape
+            avg_metrics[key] = np.mean(
+                [x for x in values if isinstance(x, np.ndarray)], axis=0)
     return avg_metrics
 
 
@@ -138,7 +148,8 @@ def train(
             'precision': [],
             'recall': [],
             'f1': [],
-            'roc_auc': []
+            'roc_auc': [],
+            'confusion_matrix': []
         }
 
         if model_name in ['Random Forest', 'Support Vector Machine']:
@@ -164,8 +175,9 @@ def train(
                 include_auc=include_auc
             )
 
-            for key, value in zip(model_metrics[model_name].keys(), metrics[:-1]):
+            for key, value in zip(list(model_metrics[model_name].keys()), metrics[:-2]):
                 model_metrics[model_name][key].append(round(value * 100, 2))
+            model_metrics[model_name]['confusion_matrix'].append(metrics[-2])
 
         models_registry[model_name] = metrics[-1]
         model_metrics[model_name] = compute_average_metrics(
@@ -173,4 +185,10 @@ def train(
 
         print("######################")
         print(model_metrics)
+
+    # for model_name, metrics in model_metrics.items():
+
+    #     plot_confusion_matrix(metrics['confusion_matrix'], classes=[
+    #                           0, 1], model_name=model_name)
+
     return model_metrics, models_registry

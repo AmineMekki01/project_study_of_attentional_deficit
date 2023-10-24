@@ -60,7 +60,7 @@ def training_pipeline(training_data_path: str, feature_selection_methods: Dict, 
 
     metrics_df.reset_index(inplace=True)
     metrics_df.columns = ['Method', 'Model', 'Accuracy',
-                          'Precision', 'Recall', 'F1', 'ROC AUC']
+                          'Precision', 'Recall', 'F1', 'ROC AUC', 'Confusion Matrix']
 
     print("The final metrics for each feature selection method and each model. \n")
     print(metrics_df)
