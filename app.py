@@ -1,6 +1,6 @@
 import os
 from flask import send_file
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory, Response
 from typing import Dict, Tuple, Callable
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -13,6 +13,9 @@ from src.pipeline.test_pipeline import testing_pipeline
 
 
 from sklearn.svm import SVC
+import json
+
+
 app = Flask(__name__)
 
 UPLOAD_FOLDER = './artifacts/data/raw/AEP/'
@@ -32,6 +35,12 @@ models: Dict[str, Callable] = {
     "Linear Discriminant Analysis": LinearDiscriminantAnalysis(),
     "Support Vector Machine": SVC(probability=True)
 }
+
+
+def json_serial(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    raise TypeError("Type not serializable")
 
 
 @app.route('/')
@@ -66,7 +75,11 @@ def train():
             metrics_df = training_pipeline(
                 set_path, chosen_FS_methods, chosen_model, cross_validation_method)
 
-            print("Metrics DF:", metrics_df)
+            cm = metrics_df['Confusion Matrix'][0]
+            classes = ['0', '1']
+
+            confusion_matrix_plot_path = plot_confusion_matrix(
+                cm, classes, model_to_use, dir_name=path_to_plots)
 
             epochs = read_eeg_data(set_path)
 
@@ -79,9 +92,13 @@ def train():
             plot_paths = {
                 'psd_path': psd_path,
                 'raw_data_path': raw_data_path,
+                "confusion_matrix_plot_path": confusion_matrix_plot_path
             }
 
-            return jsonify({'metrics': metrics_df.to_dict(orient='records'), **plot_paths})
+            json_str = json.dumps({'metrics': metrics_df.to_dict(
+                orient='records'), **plot_paths}, default=json_serial)
+
+            return Response(response=json_str, status=200, mimetype="application/json")
 
     elif request.method == 'GET':
         return render_template('trainingPage.html')
@@ -123,7 +140,10 @@ def test():
                 'raw_data_path': raw_data_path,
             }
 
-            return jsonify({'metrics': test_metrics_df.to_dict(orient='records'), **plot_paths})
+            json_str = json.dumps({'metrics': test_metrics_df.to_dict(
+                orient='records'), **plot_paths}, default=json_serial)
+
+            return Response(response=json_str, status=200, mimetype="application/json")
 
     elif request.method == 'GET':
         return render_template('testPage.html')
