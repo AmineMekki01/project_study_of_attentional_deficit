@@ -1,5 +1,7 @@
 import os
 import mne
+import matplotlib.pyplot as plt
+import numpy as np
 
 path_to_plots = './../../artifacts/plots'
 
@@ -40,3 +42,26 @@ def plot_sensor_locations(epochs, dir_name=path_to_plots):
     epochs.plot_sensors(kind='topomap', show=False).savefig(plot_2d_path)
     epochs.plot_sensors(kind='3d', show=False).savefig(plot_3d_path)
     return plot_2d_path, plot_3d_path
+
+
+def plot_confusion_matrix(cm, classes, model_name, dir_name=path_to_plots):
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    plt.title(f'Confusion Matrix for {model_name}')
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    # Add annotations to cells
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(j, i, str(cm[i, j]),
+                     horizontalalignment="center",
+                     verticalalignment="center",
+                     color="white" if cm[i, j] > cm.max() / 2 else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.savefig(f'{dir_name}/{model_name}_confusion_matrix.png')
+    final_path = f'{dir_name}/{model_name}_confusion_matrix.png'
+    return final_path
