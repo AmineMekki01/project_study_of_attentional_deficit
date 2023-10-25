@@ -68,7 +68,18 @@ def evaluate_model(
 
     y_pred = model.predict(X_test)
     cm = confusion_matrix(y_test, y_pred)
-    print("cm right after generation:", cm)
+
+    if cm.shape == (1, 1):
+        if (y_test[0] == 2) and (y_pred[0] == 2):
+            cm = np.array([[0, 0], [0, cm[0][0]]])
+        elif (y_test[0] == 1) and (y_pred[0] == 1):
+            cm = np.array([[cm[0][0], 0], [0, 0]])
+        elif (y_test[0] == 1) and (y_pred[0] == 2):
+            cm = np.array([[0, cm[0][0]], [0, 0]])
+        elif (y_test[0] == 2) and (y_pred[0] == 1):
+            cm = np.array([[0, 0], [cm[0][0], 0]])
+        else:
+            print("Something wrong with the confusion matrix")
 
     accuracy = accuracy_score(y_test, y_pred)
     precision = precision_score(
@@ -93,12 +104,15 @@ def compute_average_metrics(metrics: Dict[str, List[Union[float, str, np.ndarray
     avg_metrics = {}
     for key, values in metrics.items():
         if key != 'confusion_matrix':
-            avg_metrics[key] = np.mean(
-                [x for x in values if x != "Not available"])
+            if len([x for x in values if x != "Not available"]) > 0:
+                avg_metrics[key] = np.mean(
+                    [x for x in values if x != "Not available"])
+            else:
+                avg_metrics[key] = "Not available"
         else:
-            # Assuming that all confusion matrices have the same shape
-            avg_metrics[key] = np.mean(
+            avg_metrics[key] = np.sum(
                 [x for x in values if isinstance(x, np.ndarray)], axis=0)
+
     return avg_metrics
 
 
@@ -152,7 +166,7 @@ def train(
             'confusion_matrix': []
         }
 
-        if model_name in ['Random Forest', 'Support Vector Machine']:
+        if (cv_type == 'loo' or model_name in ['Random Forest', 'Support Vector Machine']) and (model_name != 'Linear Discriminant Analysis'):
             model_instance.set_params(class_weight='balanced')
 
         cv = StratifiedKFold(
@@ -163,32 +177,31 @@ def train(
             X_train, X_test = X[train_index], X[test_index]
             y_train, y_test = y[train_index], y[test_index]
 
-            ros = RandomOverSampler(random_state=42)
-            X_resampled, y_resampled = ros.fit_resample(X_train, y_train)
-
             metrics = evaluate_model(
                 model_instance,
-                X_resampled,
+                X_train,
                 X_test,
-                y_resampled,
+                y_train,
                 y_test,
                 include_auc=include_auc
             )
 
             for key, value in zip(list(model_metrics[model_name].keys()), metrics[:-2]):
-                model_metrics[model_name][key].append(round(value * 100, 2))
+                if isinstance(value, (float, int)):
+                    model_metrics[model_name][key].append(
+                        round(value * 100, 2))
+                else:
+                    model_metrics[model_name][key].append(value)
+
             model_metrics[model_name]['confusion_matrix'].append(metrics[-2])
 
         models_registry[model_name] = metrics[-1]
+        print('xxxx', model_metrics[model_name]["confusion_matrix"])
         model_metrics[model_name] = compute_average_metrics(
             model_metrics[model_name])
+        print('yyyy', model_metrics[model_name]["confusion_matrix"])
 
         print("######################")
         print(model_metrics)
-
-    # for model_name, metrics in model_metrics.items():
-
-    #     plot_confusion_matrix(metrics['confusion_matrix'], classes=[
-    #                           0, 1], model_name=model_name)
 
     return model_metrics, models_registry

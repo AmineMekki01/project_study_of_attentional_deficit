@@ -3,6 +3,7 @@ import mne
 from src.components.feature_engineering import get_features
 from typing import Union, Tuple
 import pandas as pd
+from sklearn.metrics import confusion_matrix
 
 
 def evaluate_on_new_data(model, path_to_new_epochs, feature_selector, include_auc=True) -> Tuple[float, float, float, float, Union[float, str]]:
@@ -55,6 +56,7 @@ def evaluate_on_new_data(model, path_to_new_epochs, feature_selector, include_au
         print(f"Error during feature extraction or prediction: {str(e)}")
         return 0, 0, 0, 0, "Not available"
 
+    cm = confusion_matrix(new_target, new_predictions)
     accuracy = accuracy_score(new_target, new_predictions)
     precision = precision_score(
         new_target, new_predictions, average='weighted')
@@ -70,6 +72,6 @@ def evaluate_on_new_data(model, path_to_new_epochs, feature_selector, include_au
             print(str(e))
 
     test_metrics_df = pd.DataFrame(
-        {'Accuracy': [accuracy], 'Precision': [precision], 'Recall': [recall], 'F1': [f1], 'ROC AUC': [roc_auc]})
+        {'Accuracy': [accuracy], 'Precision': [precision], 'Recall': [recall], 'F1': [f1], 'ROC AUC': [roc_auc], 'confusion_matrix': [cm]})
 
     return test_metrics_df
