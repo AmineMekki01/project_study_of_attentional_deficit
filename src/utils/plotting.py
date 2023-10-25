@@ -24,29 +24,34 @@ def filter_eeg_data(epochs, l_freq=1, h_freq=30):
     return epochs
 
 
-def plot_psd(epochs, dir_name=path_to_plots):
-    plot_path = f"{dir_name}/psd.png"
+def plot_psd(epochs, filename, dir_name, train_or_test):
+    plot_path = f"{dir_name}/{train_or_test}/psd_{filename}.png"
     epochs.plot_psd(show=False).savefig(plot_path)
+    plt.clf()
+
     return plot_path
 
 
-def plot_raw_data(epochs, dir_name=path_to_plots):
-    plot_path = f"{dir_name}/raw_data.png"
+def plot_raw_data(epochs, filename, dir_name, train_or_test):
+    plot_path = f"{dir_name}/{train_or_test}/raw_data_{filename}.png"
     epochs.plot(n_epochs=4, show=False).savefig(plot_path)
+    plt.clf()
     return plot_path
 
 
-def plot_sensor_locations(epochs, dir_name=path_to_plots):
-    plot_2d_path = f"{dir_name}/sensor_2d.png"
-    plot_3d_path = f"{dir_name}/sensor_3d.png"
+def plot_sensor_locations(epochs, filename, dir_name, train_or_test):
+    plot_2d_path = f"{dir_name}/{train_or_test}/sensor_2d_{filename}.png"
+    plot_3d_path = f"{dir_name}/{train_or_test}/sensor_3d_{filename}.png"
     epochs.plot_sensors(kind='topomap', show=False).savefig(plot_2d_path)
     epochs.plot_sensors(kind='3d', show=False).savefig(plot_3d_path)
+    plt.clf()
     return plot_2d_path, plot_3d_path
 
 
-def plot_confusion_matrix(cm, classes, model_name, dir_name=path_to_plots):
+def plot_confusion_matrix(cm, classes, model_name, dir_name, feature_section_method, filename, train_or_test):
     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
-    plt.title(f'Confusion Matrix for {model_name}')
+    plt.title(
+        f'Confusion Matrix for model : {model_name} filename: {filename} feature selection method: {feature_section_method}')
     plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
@@ -62,6 +67,8 @@ def plot_confusion_matrix(cm, classes, model_name, dir_name=path_to_plots):
 
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.savefig(f'{dir_name}/{model_name}_confusion_matrix.png')
-    final_path = f'{dir_name}/{model_name}_confusion_matrix.png'
+    plt.savefig(
+        f'{dir_name}/{train_or_test}/{filename}_{model_name}_{feature_section_method}_confusion_matrix.png')
+    final_path = f'{dir_name}/{train_or_test}/{filename}_{model_name}_{feature_section_method}_confusion_matrix.png'
+    plt.clf()
     return final_path
