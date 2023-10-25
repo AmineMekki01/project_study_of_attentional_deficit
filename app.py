@@ -43,6 +43,12 @@ def json_serial(obj):
     raise TypeError("Type not serializable")
 
 
+def delete_old_files(path):
+    for filename in os.listdir(path):
+        file_path = os.path.join(path, filename)
+        os.unlink(file_path)
+
+
 @app.route('/')
 def index():
     return render_template('home.html')
@@ -51,6 +57,9 @@ def index():
 @app.route('/train', methods=['GET', 'POST'])
 def train():
     if request.method == 'POST':
+
+        # delete_old_files('./artifacts/uploaded_data/')
+        # delete_old_files('./artifacts/plots/')
         feature_selection_method = request.form['featureSelection']
         model_to_use = request.form['model']
         cross_validation_method = request.form['CrossValidationMethod']
@@ -61,7 +70,8 @@ def train():
         chosen_model = {
             model_to_use: models[request.form['model']]
         }
-
+        print('zzzzzzzzzzzzzzzzzzzzz', chosen_FS_methods)
+        print('zzzzzzzzzzzzzzzzzzzzz', chosen_model)
         set_file = request.files['set_file']
         fdt_file = request.files['fdt_file']
 
@@ -79,15 +89,17 @@ def train():
             classes = ['0', '1']
 
             confusion_matrix_plot_path = plot_confusion_matrix(
-                cm, classes, model_to_use, dir_name=path_to_plots)
+                cm, classes, model_to_use, dir_name=path_to_plots, feature_section_method=feature_selection_method, filename=set_file.filename.split('.')[0], train_or_test="train")
 
             epochs = read_eeg_data(set_path)
 
             filtered_epochs = filter_eeg_data(epochs)
 
-            psd_path = plot_psd(filtered_epochs, path_to_plots)
+            psd_path = plot_psd(
+                filtered_epochs, set_file.filename.split('.')[0], path_to_plots, train_or_test="train")
 
-            raw_data_path = plot_raw_data(filtered_epochs, path_to_plots)
+            raw_data_path = plot_raw_data(
+                filtered_epochs, set_file.filename.split('.')[0], path_to_plots, train_or_test="train")
 
             plot_paths = {
                 'psd_path': psd_path,
@@ -125,19 +137,26 @@ def test():
             test_metrics_df = testing_pipeline(
                 set_path, model_to_use, feature_selection_method)
 
-            print("Test Metrics DF:", test_metrics_df)
+            cm = test_metrics_df['confusion_matrix'][0]
+            classes = ['0', '1']
+
+            confusion_matrix_plot_path = plot_confusion_matrix(
+                cm, classes, model_to_use, dir_name=path_to_plots, feature_section_method=feature_selection_method, filename=set_file.filename.split('.')[0], train_or_test="test")
 
             epochs = read_eeg_data(set_path)
 
             filtered_epochs = filter_eeg_data(epochs)
 
-            psd_path = plot_psd(filtered_epochs, path_to_plots)
+            psd_path = plot_psd(
+                filtered_epochs, set_file.filename.split('.')[0], path_to_plots, train_or_test="test")
 
-            raw_data_path = plot_raw_data(filtered_epochs, path_to_plots)
+            raw_data_path = plot_raw_data(
+                filtered_epochs, set_file.filename.split('.')[0], path_to_plots, train_or_test="test")
 
             plot_paths = {
                 'psd_path': psd_path,
                 'raw_data_path': raw_data_path,
+                "confusion_matrix_plot_path": confusion_matrix_plot_path
             }
 
             json_str = json.dumps({'metrics': test_metrics_df.to_dict(
@@ -156,9 +175,19 @@ def method_not_allowed(e):
     return "Method not allowed. Please use the correct HTTP verb.", 405
 
 
-@app.route('/artifacts/plots/<filename>')
-def serve_plot(filename):
-    return send_file(f'.\\artifacts\\plots\\{filename}', mimetype='image/png')
+@app.route('/artifacts/plots/<string:train_or_test>/<filename>')
+def serve_plot(train_or_test, filename):
+    if train_or_test not in ['train', 'test']:
+        return "Invalid type, must be either 'train' or 'test'", 400
+
+    base_dir = os.path.abspath(os.path.dirname(__file__))
+    file_path = os.path.join(base_dir, 'artifacts',
+                             'plots', train_or_test, filename)
+
+    if not os.path.exists(file_path):
+        return "File not found", 404
+
+    return send_file(file_path, mimetype='image/png')
 
 
 if __name__ == '__main__':
