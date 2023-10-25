@@ -41,9 +41,10 @@ def training_pipeline(training_data_path: str, feature_selection_methods: Dict, 
     for method in feature_selection_methods:
 
         print(f"Feature Selection Method: {method}")
-
+        print('xxxxxasdxxx', feature_selection_methods[method])
         X_new, fitted_feature_selector = perform_feature_selection(
             features, target, feature_selection_methods[method])
+
         hashmap_fitted_feature_selector[method] = fitted_feature_selector
 
         model_metrics, model_registry = train_models(
