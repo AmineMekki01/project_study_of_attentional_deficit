@@ -33,16 +33,34 @@ function createTableFromJSON(jsonObj) {
 function setupFormSubmit(endpoint) {
     $('#upload-form').submit(function(e) {
         e.preventDefault();
+
+        $('.results-container').css('display', 'none');
+        $('#metrics_id').empty();
+        // remove data from previous submission
+        $('#psd-plot').attr('src', '');
+        $('#raw-data-plot').attr('src', '');
+        $('#train-confusion-matrix').attr('src', '');
+        $('#test-confusion-matrix').attr('src', '');
+
+        
         var formData = new FormData(this);
         $.ajax({
             url: endpoint,
             type: 'POST',
             data: formData,
             success: function(data) {
-                console.log("xxxxxxxxxx",data);
+    
+                $('#psd-plot').attr('src', '');
+                $('#raw-data-plot').attr('src', '');
+                $('#train-confusion-matrix').attr('src', '');
+                $('#test-confusion-matrix').attr('src', '');
+                // Step 2: Show the results container when the new data arrives
+                $('.results-container').css('display', 'block');
+
                 $('#psd-plot').attr('src', data.psd_path);
                 $('#raw-data-plot').attr('src', data.raw_data_path);
                 $('#train-confusion-matrix').attr('src', data.confusion_matrix_plot_path);
+                
                 var table = createTableFromJSON(data.metrics);
                 $('#metrics_id').html(table);
             },
@@ -52,6 +70,7 @@ function setupFormSubmit(endpoint) {
         });
     });
 }
+
 
 $(document).ready(function() {
     console.log("jQuery Loaded");
