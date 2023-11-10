@@ -82,10 +82,14 @@ def train():
             set_file.save(set_path)
             fdt_file.save(fdt_path)
 
-            metrics_df = training_pipeline(
+            metrics_df, model_path, selector_path = training_pipeline(
                 set_path, chosen_FS_methods, chosen_model, cross_validation_method)
 
-            cm = metrics_df['Confusion Matrix'][0]
+            print('xxxxxxx')
+            print(metrics_df)
+
+            cm = metrics_df['Confusion Matrix'].iloc[0]
+            print('cm', cm)
             classes = ['0', '1']
 
             confusion_matrix_plot_path = plot_confusion_matrix(
@@ -134,8 +138,11 @@ def test():
             set_file.save(set_path)
             fdt_file.save(fdt_path)
 
+            path_to_model = f"./artifacts/models/{feature_selection_method}_{model_to_use}.joblib"
+            path_to_feature_selector = f"./artifacts/feature_selectors/{feature_selection_method}.joblib"
+
             test_metrics_df = testing_pipeline(
-                set_path, model_to_use, feature_selection_method)
+                set_path, path_to_model, path_to_feature_selector)
 
             cm = test_metrics_df['confusion_matrix'][0]
             classes = ['0', '1']
