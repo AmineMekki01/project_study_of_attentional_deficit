@@ -70,17 +70,16 @@ def training_pipeline(training_data_path: str, feature_selection_methods: Dict, 
 
     # Step 4: Save models and feature selectors
 
-    # Step 4: Evaluate the best model on test data
     best_feature_selection_method = list(feature_selection_methods.keys())[0]
     best_model = list(
         models_registry_per_FSM[best_feature_selection_method].keys())[0]
     best_trained_model = models_registry_per_FSM[best_feature_selection_method][best_model]
     best_fitted_feature_selector = hashmap_fitted_feature_selector[best_feature_selection_method]
 
-    # Save the best model and feature selector
-    dump(best_trained_model,
-         f'./artifacts/models/{best_feature_selection_method}_{best_model}.joblib')
-    dump(best_fitted_feature_selector,
-         f'./artifacts/feature_selectors/{best_feature_selection_method}.joblib')
+    best_trained_model_path = f'./artifacts/models/{best_feature_selection_method}_{best_model}.joblib'
+    best_fitted_feature_selector_path = f'./artifacts/feature_selectors/{best_feature_selection_method}.joblib'
 
-    return metrics_df
+    dump(best_trained_model, best_trained_model_path)
+    dump(fitted_feature_selector, best_fitted_feature_selector_path)
+
+    return metrics_df, best_trained_model_path, best_fitted_feature_selector_path

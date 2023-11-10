@@ -49,6 +49,9 @@ def plot_sensor_locations(epochs, filename, dir_name, train_or_test):
 
 
 def plot_confusion_matrix(cm, classes, model_name, dir_name, feature_section_method, filename, train_or_test):
+
+    cm = np.array(cm) if not isinstance(cm, np.ndarray) else cm
+    plt.figure()
     plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
     plt.title(
         f'Confusion Matrix for model : {model_name} filename: {filename} feature selection method: {feature_section_method}')
