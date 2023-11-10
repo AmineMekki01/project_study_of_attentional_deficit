@@ -36,7 +36,6 @@ function setupFormSubmit(endpoint) {
 
         $('.results-container').css('display', 'none');
         $('#metrics_id').empty();
-        // remove data from previous submission
         $('#psd-plot').attr('src', '');
         $('#raw-data-plot').attr('src', '');
         $('#train-confusion-matrix').attr('src', '');
@@ -54,7 +53,6 @@ function setupFormSubmit(endpoint) {
                 $('#raw-data-plot').attr('src', '');
                 $('#train-confusion-matrix').attr('src', '');
                 $('#test-confusion-matrix').attr('src', '');
-                // Step 2: Show the results container when the new data arrives
                 $('.results-container').css('display', 'block');
 
                 $('#psd-plot').attr('src', data.psd_path);
