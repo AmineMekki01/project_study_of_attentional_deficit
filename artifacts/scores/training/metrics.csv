@@ -1,3 +1,3 @@
 Method,Model,Accuracy,Precision,Recall,F1,ROC AUC,Confusion Matrix
-RFC,Random Forest,86.042,83.358,86.042,84.026,72.37199999999999,"[[80.2  3.8]
- [ 9.6  2.4]]"
+RFE,Random Forest,86.66799999999999,79.39399999999999,86.66799999999999,82.21200000000002,73.84,"[[413   7]
+ [ 57   3]]"
