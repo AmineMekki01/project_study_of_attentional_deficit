@@ -70,8 +70,6 @@ def train():
         chosen_model = {
             model_to_use: models[request.form['model']]
         }
-        print('zzzzzzzzzzzzzzzzzzzzz', chosen_FS_methods)
-        print('zzzzzzzzzzzzzzzzzzzzz', chosen_model)
         set_file = request.files['set_file']
         fdt_file = request.files['fdt_file']
 
@@ -85,11 +83,7 @@ def train():
             metrics_df, model_path, selector_path = training_pipeline(
                 set_path, chosen_FS_methods, chosen_model, cross_validation_method)
 
-            print('xxxxxxx')
-            print(metrics_df)
-
             cm = metrics_df['Confusion Matrix'].iloc[0]
-            print('cm', cm)
             classes = ['0', '1']
 
             confusion_matrix_plot_path = plot_confusion_matrix(

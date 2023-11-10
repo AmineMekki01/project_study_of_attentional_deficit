@@ -196,12 +196,7 @@ def train(
             model_metrics[model_name]['confusion_matrix'].append(metrics[-2])
 
         models_registry[model_name] = metrics[-1]
-        print('xxxx', model_metrics[model_name]["confusion_matrix"])
         model_metrics[model_name] = compute_average_metrics(
             model_metrics[model_name])
-        print('yyyy', model_metrics[model_name]["confusion_matrix"])
-
-        print("######################")
-        print(model_metrics)
 
     return model_metrics, models_registry

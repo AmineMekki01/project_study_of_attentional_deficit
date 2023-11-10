@@ -26,19 +26,5 @@ def testing_pipeline(
     metrics_df = evaluate_on_new_data(
         loaded_model, testing_data_path, loaded_feature_selector, include_auc=True)
 
+    metrics_df.to_csv("./artifacts/scores/testing/metrics.csv", index=False)
     return metrics_df
-
-
-# (test_data_path: str, chosen_model: str, chosen_feature_selector: str) -> pd.DataFrame:
-#     # Load the chosen model and feature selector
-#     loaded_model = load(
-#         f'./artifacts/models/#{chosen_feature_selector}_{chosen_model}.joblib')
-#     loaded_feature_selector = load(
-#         f'./artifacts/feature_selectors/{chosen_feature_selector}.joblib')
-
-#     metrics_df = evaluate_on_new_data(
-#         loaded_model, test_data_path, loaded_feature_selector)
-
-#     metrics_df['Model'] = chosen_model
-#     metrics_df['Method'] = chosen_feature_selector
-#     return metrics_df

@@ -41,13 +41,14 @@ models: Dict[str, Callable] = {
 
 if __name__ == "__main__":
     try:
-        # Run the training pipeline
         df_train_metrics, best_trained_model_path, best_fitted_feature_selector_path = training_pipeline(
             DATA_PATH_S11,
             feature_selection_methods,
             models,
             EVALUATION_METHOD
         )
+
+        print("The final training metrics for each feature selection method and each model. \n")
         print(df_train_metrics)
     except Exception as e:
         print(f"An error occurred during training: {e}")
@@ -55,6 +56,7 @@ if __name__ == "__main__":
     try:
         df_test_metrics = testing_pipeline(
             TEST_DATA_PATH, best_trained_model_path, best_fitted_feature_selector_path)
+        print("The test metrics. \n")
         print(df_test_metrics)
     except Exception as e:
         print(f"An error occurred during testing: {e}")

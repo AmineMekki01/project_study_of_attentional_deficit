@@ -1,2 +1,3 @@
-Feature Selection Method,Model,Accuracy,Precision,Recall,F1,ROC AUC
-RFC,Random Forest,0.975,0.9745696400625978,0.975,0.9744307577454273,0.9692261904761906
+Accuracy,Precision,Recall,F1,ROC AUC,confusion_matrix
+0.875,0.765625,0.875,0.8166666666666667,0.5852777777777778,"[[420   0]
+ [ 60   0]]"

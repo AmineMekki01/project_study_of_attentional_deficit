@@ -41,7 +41,6 @@ def training_pipeline(training_data_path: str, feature_selection_methods: Dict, 
     for method in feature_selection_methods:
 
         print(f"Feature Selection Method: {method}")
-        print('xxxxxasdxxx', feature_selection_methods[method])
         X_new, fitted_feature_selector = perform_feature_selection(
             features, target, feature_selection_methods[method])
 
@@ -62,9 +61,6 @@ def training_pipeline(training_data_path: str, feature_selection_methods: Dict, 
     metrics_df.reset_index(inplace=True)
     metrics_df.columns = ['Method', 'Model', 'Accuracy',
                           'Precision', 'Recall', 'F1', 'ROC AUC', 'Confusion Matrix']
-
-    print("The final metrics for each feature selection method and each model. \n")
-    print(metrics_df)
 
     metrics_df.to_csv("./artifacts/scores/training/metrics.csv", index=False)
 
